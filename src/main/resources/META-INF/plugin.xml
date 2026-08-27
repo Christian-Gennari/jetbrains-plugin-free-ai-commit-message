@@ -10,7 +10,7 @@
     
     <h4>Features</h4>
     <ul>
-        <li><b>100% Free AI Defaults:</b> Out-of-the-box support for Google Gemini 3.5 Flash Lite, Groq LPU, local Ollama, OpenRouter Free tier, and GitHub Models.</li>
+        <li><b>100% Free AI Defaults:</b> Out-of-the-box support for Gemini, Groq, local Ollama, OpenRouter, and GitHub Models.</li>
         <li><b>BYOK Support:</b> Bring Your Own Key for DeepSeek, OpenAI, and Anthropic Claude.</li>
         <li><b>Encrypted Key Storage:</b> Keys are stored securely in JetBrains <code>PasswordSafe</code> (OS Keychain / Credential Manager / Secret Service). Zero plaintext tokens in config files.</li>
         <li><b>Commit Toolbar Integration:</b> One-click generation directly in the Git Commit Tool Window.</li>

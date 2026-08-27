@@ -4,9 +4,9 @@
 
 **Generate clean, conventional Git commit messages directly in JetBrains Rider, IntelliJ IDEA, PyCharm, WebStorm, and all IntelliJ Platform IDEs.**
 
-Works out-of-the-box with **Google Gemini (1,500 req/day free)**, **Groq (14,400 req/day free)**, **GitHub Models**, **OpenRouter**, and **100% offline local Ollama**, as well as DeepSeek, OpenAI, and Anthropic Claude.
+Works out-of-the-box with **Gemini (1,500 req/day free)**, **Groq (14,400 req/day free)**, **GitHub Models**, **OpenRouter**, and **100% offline local Ollama**, as well as DeepSeek, OpenAI, and Anthropic Claude.
 
-[![JetBrains Plugin](https://img.shields.io/badge/JetBrains%20Marketplace-v0.1.1-blue?logo=jetbrains)](https://plugins.jetbrains.com/)
+[![Release](https://img.shields.io/github/v/release/Christian-Gennari/jetbrains-plugin-free-ai-commit-message?logo=github&label=Release)](https://github.com/Christian-Gennari/jetbrains-plugin-free-ai-commit-message/releases)
 [![CI](https://github.com/Christian-Gennari/jetbrains-plugin-free-ai-commit-message/actions/workflows/ci.yml/badge.svg)](https://github.com/Christian-Gennari/jetbrains-plugin-free-ai-commit-message/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE.txt)
 [![GitHub](https://img.shields.io/badge/GitHub-Repository-black?logo=github)](https://github.com/Christian-Gennari/jetbrains-plugin-free-ai-commit-message)
