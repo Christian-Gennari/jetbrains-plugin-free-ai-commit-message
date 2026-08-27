@@ -48,7 +48,9 @@ intellijPlatform {
     }
     pluginVerification {
         ides {
-            recommended()
+            ide("2024.1")
+            ide("2024.2")
+            ide("2024.3")
         }
     }
     signing {

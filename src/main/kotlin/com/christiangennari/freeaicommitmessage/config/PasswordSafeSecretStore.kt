@@ -8,7 +8,7 @@ class PasswordSafeSecretStore : SecretStore {
 
     private fun createAttributes(profileId: String): CredentialAttributes {
         val serviceName = generateServiceName("FreeAiCommitMessage", profileId)
-        return CredentialAttributes(serviceName, profileId)
+        return CredentialAttributes(serviceName)
     }
 
     override fun getApiKey(profileId: String): String? {
