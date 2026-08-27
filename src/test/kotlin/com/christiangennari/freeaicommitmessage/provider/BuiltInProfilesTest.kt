@@ -9,8 +9,9 @@ class BuiltInProfilesTest {
     @Test
     fun `test built-in presets presence`() {
         val presets = BuiltInProfiles.ALL_PRESETS
-        assertEquals(8, presets.size)
+        assertEquals(9, presets.size)
 
+        assertNotNull(BuiltInProfiles.findById("free"))
         assertNotNull(BuiltInProfiles.findById("gemini"))
         assertNotNull(BuiltInProfiles.findById("groq"))
         assertNotNull(BuiltInProfiles.findById("ollama"))

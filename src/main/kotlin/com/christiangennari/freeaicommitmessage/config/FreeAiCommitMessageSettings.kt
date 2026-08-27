@@ -7,7 +7,7 @@ import com.intellij.util.xmlb.annotations.Tag
 import com.intellij.util.xmlb.annotations.XCollection
 
 class FreeAiCommitMessageSettings {
-    var activeProfileId: String = BuiltInProfiles.GEMINI.id
+    var activeProfileId: String = BuiltInProfiles.FREE_CLOUD.id
     var maxDiffCharacters: Int = 12000
     var requestTimeoutMs: Long = 120000L
     var defaultTemperature: Double = 0.2

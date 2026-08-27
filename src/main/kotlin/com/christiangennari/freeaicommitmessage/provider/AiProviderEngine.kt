@@ -21,7 +21,7 @@ class AiProviderEngine(
     ): ProviderResult {
         return when (profile.kind) {
             ProviderKind.GEMINI -> geminiProvider.generate(profile, apiKey, input, options, indicator)
-            ProviderKind.OPENAI_COMPATIBLE, ProviderKind.OLLAMA -> openAiProvider.generate(profile, apiKey, input, options, indicator)
+            ProviderKind.FREE_CLOUD, ProviderKind.OPENAI_COMPATIBLE, ProviderKind.OLLAMA -> openAiProvider.generate(profile, apiKey, input, options, indicator)
             ProviderKind.ANTHROPIC -> anthropicProvider.generate(profile, apiKey, input, options, indicator)
         }
     }

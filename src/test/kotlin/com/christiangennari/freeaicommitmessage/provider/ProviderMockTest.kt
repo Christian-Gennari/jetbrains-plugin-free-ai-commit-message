@@ -176,4 +176,32 @@ class ProviderMockTest {
         assertTrue(error.message.contains("Invalid Gemini API key"))
         assertTrue(!error.message.contains("internal secret token"))
     }
+
+    @Test
+    fun `test free cloud provider generates commit message with zero api key required`() {
+        val mockClient = MockHttpClient { req ->
+            val jsonResponse = """
+                {
+                    "choices": [
+                        {
+                            "message": {
+                                "role": "assistant",
+                                "content": "feat: zero setup commit message"
+                            }
+                        }
+                    ]
+                }
+            """.trimIndent()
+            MockHttpResponse(200, jsonResponse)
+        }
+
+        val provider = OpenAiCompatibleProvider(mockClient)
+        val profile = BuiltInProfiles.FREE_CLOUD
+        val input = CommitInput("diff", "", emptyList())
+
+        val result = provider.generate(profile, null, input, GenerationOptions())
+
+        assertTrue(result is ProviderResult.Success)
+        assertEquals("feat: zero setup commit message", (result as ProviderResult.Success).message.subject)
+    }
 }
