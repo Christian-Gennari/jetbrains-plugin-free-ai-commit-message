@@ -46,7 +46,6 @@
                 text="Generate AI Commit Message"
                 description="Generate a conventional commit message from staged changes"
                 icon="/icons/freeAiCommitMessage.svg">
-            <add-to-group group-id="ChangesView.CommitToolbar" anchor="last"/>
             <add-to-group group-id="Vcs.MessageActionGroup" anchor="last"/>
             <keyboard-shortcut keymap="$default" first-keystroke="control alt G"/>
         </action>
