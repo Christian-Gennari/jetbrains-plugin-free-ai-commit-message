@@ -4,7 +4,7 @@
 
 **Generate clean, conventional Git commit messages directly in JetBrains Rider, IntelliJ IDEA, PyCharm, WebStorm, and all IntelliJ Platform IDEs.**
 
-Works out-of-the-box with **Gemini (1,500 req/day free)**, **Groq (14,400 req/day free)**, **GitHub Models**, **OpenRouter**, and **100% offline local Ollama**, as well as DeepSeek, OpenAI, and Anthropic Claude.
+Connects directly using your own API keys—leveraging generous free daily quotas from **Gemini (1,500 req/day)**, **Groq (14,400 req/day)**, **GitHub Models**, and **OpenRouter**, or running **100% offline with local Ollama** (no key required). Also supports DeepSeek, OpenAI, and Anthropic Claude.
 
 [![Release](https://img.shields.io/github/v/release/Christian-Gennari/jetbrains-plugin-free-ai-commit-message?logo=github&label=Release)](https://github.com/Christian-Gennari/jetbrains-plugin-free-ai-commit-message/releases)
 [![CI](https://github.com/Christian-Gennari/jetbrains-plugin-free-ai-commit-message/actions/workflows/ci.yml/badge.svg)](https://github.com/Christian-Gennari/jetbrains-plugin-free-ai-commit-message/actions/workflows/ci.yml)

@@ -10,8 +10,8 @@
     
     <h4>Features</h4>
     <ul>
-        <li><b>100% Free AI Defaults:</b> Out-of-the-box support for Gemini, Groq, local Ollama, OpenRouter, and GitHub Models.</li>
-        <li><b>BYOK Support:</b> Bring Your Own Key for DeepSeek, OpenAI, and Anthropic Claude.</li>
+        <li><b>BYOK with Free Quotas:</b> Connect directly with your own API keys for Gemini, Groq, OpenRouter, GitHub Models, DeepSeek, OpenAI, and Claude.</li>
+        <li><b>100% Offline Local Models:</b> Run completely offline with local Ollama (no API key required).</li>
         <li><b>Encrypted Key Storage:</b> Keys are stored securely in JetBrains <code>PasswordSafe</code> (OS Keychain / Credential Manager / Secret Service). Zero plaintext tokens in config files.</li>
         <li><b>Commit Toolbar Integration:</b> One-click generation directly in the Git Commit Tool Window.</li>
         <li><b>Context-Aware:</b> Existing commit notes are passed as guidance context.</li>
