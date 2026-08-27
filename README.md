@@ -6,25 +6,29 @@
 
 Works out-of-the-box with **Google Gemini (1,500 req/day free)**, **Groq (14,400 req/day free)**, **GitHub Models**, **OpenRouter**, and **100% offline local Ollama**, as well as DeepSeek, OpenAI, and Anthropic Claude.
 
-[![JetBrains Plugin](https://img.shields.io/badge/JetBrains%20Marketplace-v0.1.0-blue?logo=jetbrains)](https://plugins.jetbrains.com/)
+[![JetBrains Plugin](https://img.shields.io/badge/JetBrains%20Marketplace-v0.1.1-blue?logo=jetbrains)](https://plugins.jetbrains.com/)
 [![CI](https://github.com/Christian-Gennari/jetbrains-plugin-free-ai-commit-message/actions/workflows/ci.yml/badge.svg)](https://github.com/Christian-Gennari/jetbrains-plugin-free-ai-commit-message/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE.txt)
 [![GitHub](https://img.shields.io/badge/GitHub-Repository-black?logo=github)](https://github.com/Christian-Gennari/jetbrains-plugin-free-ai-commit-message)
 
 </div>
 
+> **Using Visual Studio Code?** Check out the sibling extension: [Free AI Commit Message for VS Code](https://marketplace.visualstudio.com/items?itemName=christiangennari.free-ai-commit-message) ([GitHub Repository](https://github.com/Christian-Gennari/vscode-extension-free-ai-commit-message)).
+
 ---
 
 ## Quick Start
 
-1. **Stage your Git changes** in the Git Commit Tool Window (`Alt+0` / `Cmd+0`).
+1. **Select or Stage your Git changes:**
+   - Open the **Commit Tool Window** (`Alt+0` / `Cmd+0`).
+   - Works automatically with both **Default Changelists** (unstaged modified files) and the **Git Staging Area** (`git diff --cached`).
 2. **Set your API Key:**
    - Open **Settings / Preferences** (`Ctrl+Alt+S` / `Cmd+,`)
    - Navigate to **Tools -> Free AI Commit Message**
    - Select your active provider and enter your API key *(saved securely in OS Keychain via JetBrains `PasswordSafe`)*.
 3. **Generate your Commit Message:**
-   - Click the **Sparkle icon** in the Commit message toolbar, or press **`Ctrl+Alt+G`** (`Cmd+Alt+G` on macOS).
-   - The conventional commit message is generated in the background and placed in the commit box.
+   - Click the **Sparkle icon** (`✨`) in the Commit message toolbar, or press **`Ctrl+Alt+G`** (`Cmd+Alt+G` on macOS).
+   - The conventional commit message is generated in the background and placed directly in the commit message box.
 
 ---
 
@@ -32,7 +36,7 @@ Works out-of-the-box with **Google Gemini (1,500 req/day free)**, **Groq (14,400
 
 Providers ranked by speed, reliability, and free daily quota:
 
-| Rank | Provider | Default Model | Speed & Reliability | Free Daily Quota | Key Source |
+| Rank | Provider | Default Model | Speed & Characteristics | Free Daily Quota | Key Source |
 | :---: | :--- | :--- | :--- | :--- | :--- |
 | **#1** | **Google Gemini** *(Default)* | `gemini-3.5-flash-lite` | Highest reliability & quality | **1,500 req/day** (30 RPM) | [Google AI Studio](https://aistudio.google.com/app/apikey) |
 | **#2** | **Groq Cloud** | `openai/gpt-oss-120b` | Fastest (~300ms LPU latency) | **14,400 req/day** (30 RPM) | [Groq Console](https://console.groq.com/keys) |
@@ -80,7 +84,7 @@ Open **Settings / Preferences** (`Ctrl+Alt+S` / `Cmd+,`) -> **Tools** -> **Free 
 ## Security & Privacy
 
 - **Encrypted Secret Storage:** API keys are stored exclusively in your operating system's native keychain (macOS Keychain, Windows Credential Manager, Linux Secret Service / KWallet) via JetBrains `PasswordSafe`. They are never written to XML configuration files or logs.
-- **Direct Client-to-API:** Diff data travels directly from your IDE to the chosen provider API over TLS. No intermediate telemetry or middleman proxy servers are used.
+- **Direct Client-to-API:** Diff data travels directly from your IDE to the chosen provider API over TLS. No intermediate telemetry, tracking, or middleman proxy servers are used.
 - **Local Isolation with Ollama:** When complete privacy is required, select the **Ollama** profile (`http://localhost:11434/v1`). Zero code or metadata leaves your local workstation.
 - **Prompt Isolation:** Staged diffs, file lists, and user notes are strictly delimited and marked as untrusted input to defend against prompt injection.
 
