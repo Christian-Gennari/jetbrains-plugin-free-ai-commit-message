@@ -6,7 +6,7 @@
 
 Connects directly using your own API keys—leveraging generous free daily quotas from **Gemini (1,500 req/day)**, **Groq (14,400 req/day)**, **GitHub Models**, and **OpenRouter**, or running **100% offline with local Ollama** (no key required). Also supports DeepSeek, OpenAI, and Anthropic Claude.
 
-[![Release](https://img.shields.io/github/v/release/Christian-Gennari/jetbrains-plugin-free-ai-commit-message?logo=github&label=Release)](https://github.com/Christian-Gennari/jetbrains-plugin-free-ai-commit-message/releases)
+[![JetBrains Marketplace](https://img.shields.io/badge/JetBrains%20Marketplace-Install-blue?logo=jetbrains)](https://plugins.jetbrains.com/)
 [![CI](https://github.com/Christian-Gennari/jetbrains-plugin-free-ai-commit-message/actions/workflows/ci.yml/badge.svg)](https://github.com/Christian-Gennari/jetbrains-plugin-free-ai-commit-message/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE.txt)
 [![GitHub](https://img.shields.io/badge/GitHub-Repository-black?logo=github)](https://github.com/Christian-Gennari/jetbrains-plugin-free-ai-commit-message)
