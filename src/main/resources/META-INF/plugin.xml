@@ -1,0 +1,54 @@
+<!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
+<idea-plugin>
+    <id>com.christiangennari.freeaicommitmessage</id>
+    <name>Free AI Commit Message</name>
+    <vendor email="christian.gennari@gmail.com" url="https://github.com/Christian-Gennari">Christian Gennari</vendor>
+
+    <description><![CDATA[
+    <h3>Free AI Commit Message for JetBrains IDEs</h3>
+    <p>Generate clean, descriptive, conventional commit messages directly from your staged Git changes in JetBrains Rider, IntelliJ IDEA, PyCharm, WebStorm, and other IntelliJ Platform IDEs.</p>
+    
+    <h4>Features</h4>
+    <ul>
+        <li><b>100% Free AI Defaults:</b> Out-of-the-box support for Google Gemini 3.5 Flash Lite, Groq LPU, local Ollama, OpenRouter Free tier, and GitHub Models.</li>
+        <li><b>BYOK Support:</b> Bring Your Own Key for DeepSeek, OpenAI, and Anthropic Claude.</li>
+        <li><b>Encrypted Key Storage:</b> Keys are stored securely in JetBrains <code>PasswordSafe</code> (OS Keychain / Credential Manager / Secret Service). Zero plaintext tokens in config files.</li>
+        <li><b>Commit Toolbar Integration:</b> One-click generation directly in the Git Commit Tool Window.</li>
+        <li><b>Context-Aware:</b> Existing commit notes are passed as guidance context.</li>
+        <li><b>Customizable:</b> Temperature, request timeout, diff budget, language, and Gitmoji toggle.</li>
+    </ul>
+    ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.vcs</depends>
+    <depends>Git4Idea</depends>
+
+    <resource-bundle>messages.FreeAiCommitMessageBundle</resource-bundle>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- Application Settings Service -->
+        <applicationService serviceImplementation="com.christiangennari.freeaicommitmessage.config.FreeAiCommitMessageSettingsService"/>
+
+        <!-- Settings Configurable -->
+        <applicationConfigurable
+                parentId="tools"
+                instance="com.christiangennari.freeaicommitmessage.config.FreeAiCommitMessageConfigurable"
+                id="com.christiangennari.freeaicommitmessage.config.FreeAiCommitMessageConfigurable"
+                displayName="Free AI Commit Message"/>
+
+        <!-- Notification Group -->
+        <notificationGroup id="Free AI Commit Message" displayType="BALLOON"/>
+    </extensions>
+
+    <actions>
+        <action id="com.christiangennari.freeaicommitmessage.action.GenerateCommitMessageAction"
+                class="com.christiangennari.freeaicommitmessage.action.GenerateCommitMessageAction"
+                text="Generate AI Commit Message"
+                description="Generate a conventional commit message from staged changes"
+                icon="/icons/freeAiCommitMessage.svg">
+            <add-to-group group-id="ChangesView.CommitToolbar" anchor="last"/>
+            <add-to-group group-id="Vcs.MessageActionGroup" anchor="last"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="control alt G"/>
+        </action>
+    </actions>
+</idea-plugin>
