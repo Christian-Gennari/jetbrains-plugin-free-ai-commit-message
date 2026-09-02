@@ -4,11 +4,14 @@ import com.christiangennari.freeaicommitmessage.domain.ProviderKind
 import com.christiangennari.freeaicommitmessage.domain.ProviderProfile
 
 object BuiltInProfiles {
+    const val FREE_PRIMARY_ENDPOINT = "https://commit.cgennari.com/v1"
+    const val FREE_FALLBACK_ENDPOINT = "https://free-ai-commit-fallback.api-9d5.workers.dev/v1"
+
     val FREE_CLOUD = ProviderProfile(
         id = "free",
         name = "Free (No Setup Required)",
         kind = ProviderKind.FREE_CLOUD,
-        endpoint = "https://commit.cgennari.com/v1",
+        endpoint = FREE_PRIMARY_ENDPOINT,
         model = "free",
         isBuiltIn = true
     )

@@ -19,12 +19,31 @@ class AiProviderEngine(
         options: GenerationOptions,
         indicator: ProgressIndicator? = null
     ): ProviderResult {
+        if (isPrimaryFreeCloud(profile)) {
+            val primaryResult = generateOnce(profile, apiKey, input, options, indicator)
+            if (primaryResult !is ProviderResult.Error || !primaryResult.retryable) return primaryResult
+
+            // The fallback is keyless even if a stale key exists for the free profile.
+            return generateOnce(
+                profile.copy(endpoint = BuiltInProfiles.FREE_FALLBACK_ENDPOINT),
+                null,
+                input,
+                options,
+                indicator
+            )
+        }
+
         var attempt = 0
         while (true) {
             val result = generateOnce(profile, apiKey, input, options, indicator)
             if (result !is ProviderResult.Error || !result.retryable || attempt >= 1) return result
             attempt += 1
         }
+    }
+
+    private fun isPrimaryFreeCloud(profile: ProviderProfile): Boolean {
+        return profile.kind == ProviderKind.FREE_CLOUD &&
+            profile.endpoint.trimEnd('/') == BuiltInProfiles.FREE_PRIMARY_ENDPOINT
     }
 
     private fun generateOnce(

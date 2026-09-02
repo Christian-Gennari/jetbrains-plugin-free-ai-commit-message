@@ -88,9 +88,12 @@ class OpenAiCompatibleProvider(private val httpClient: HttpClient = HttpClient.n
             .timeout(Duration.ofMillis(timeout))
             .POST(HttpRequest.BodyPublishers.ofString(requestJson))
 
-        if (!apiKey.isNullOrBlank()) {
+        if (profile.kind.requiresApiKey && !apiKey.isNullOrBlank()) {
             requestBuilder.header("Authorization", "Bearer $apiKey")
         }
+
+        requestBuilder.header("Accept", "application/json")
+        requestBuilder.header("User-Agent", CLIENT_USER_AGENT)
 
         val future = httpClient.sendAsync(requestBuilder.build(), HttpResponse.BodyHandlers.ofString())
 
@@ -104,7 +107,7 @@ class OpenAiCompatibleProvider(private val httpClient: HttpClient = HttpClient.n
                 }
                 val rawText = choice?.message?.content
                 if (rawText.isNullOrBlank()) {
-                    ProviderResult.Error("Provider returned an empty response.", response.statusCode())
+                    ProviderResult.Error("Provider returned an empty response.", response.statusCode(), retryable = true)
                 } else {
                     ProviderResult.Success(ConventionalCommitSanitizer.sanitize(rawText))
                 }
@@ -115,7 +118,11 @@ class OpenAiCompatibleProvider(private val httpClient: HttpClient = HttpClient.n
                     in 500..599 -> "${profile.name} service error (HTTP ${response.statusCode()})."
                     else -> "${profile.name} returned HTTP ${response.statusCode()}."
                 }
-                ProviderResult.Error(statusMsg, response.statusCode())
+                ProviderResult.Error(
+                    statusMsg,
+                    response.statusCode(),
+                    retryable = response.statusCode() == 408 || response.statusCode() == 429 || response.statusCode() in 500..599
+                )
             }
         } catch (e: InvalidCommitMessageException) {
             ProviderResult.Error(e.message ?: InvalidCommitMessageException.MESSAGE, retryable = true)
@@ -137,18 +144,18 @@ class OpenAiCompatibleProvider(private val httpClient: HttpClient = HttpClient.n
                     Thread.currentThread().interrupt()
                     ProviderResult.Cancelled
                 }
-                is HttpTimeoutException, is TimeoutException -> ProviderResult.Error("${profile.name} request timed out.")
-                is IOException -> ProviderResult.Error("Could not connect to ${profile.name}.")
+                is HttpTimeoutException, is TimeoutException -> ProviderResult.Error("${profile.name} request timed out.", retryable = true)
+                is IOException -> ProviderResult.Error("Could not connect to ${profile.name}.", retryable = true)
                 else -> ProviderResult.Error("Network error calling ${profile.name}.")
             }
         } catch (e: HttpTimeoutException) {
             future.cancel(true)
-            ProviderResult.Error("${profile.name} request timed out.")
+            ProviderResult.Error("${profile.name} request timed out.", retryable = true)
         } catch (e: TimeoutException) {
             future.cancel(true)
-            ProviderResult.Error("${profile.name} request timed out.")
+            ProviderResult.Error("${profile.name} request timed out.", retryable = true)
         } catch (e: IOException) {
-            ProviderResult.Error("Could not connect to ${profile.name}.")
+            ProviderResult.Error("Could not connect to ${profile.name}.", retryable = true)
         } catch (e: Exception) {
             ProviderResult.Error("Unexpected error calling ${profile.name}.")
         }
@@ -176,5 +183,9 @@ class OpenAiCompatibleProvider(private val httpClient: HttpClient = HttpClient.n
                 // Poll check for indicator cancellation
             }
         }
+    }
+
+    private companion object {
+        const val CLIENT_USER_AGENT = "Free-AI-Commit-Message/1.0"
     }
 }
