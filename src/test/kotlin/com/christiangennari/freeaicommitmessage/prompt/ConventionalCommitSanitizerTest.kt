@@ -17,6 +17,15 @@ class ConventionalCommitSanitizerTest {
     }
 
     @Test
+    fun `accepts Gitmoji-prefixed conventional commit messages`() {
+        val unicode = ConventionalCommitSanitizer.sanitize("✨ feat: add output validation")
+        assertEquals("✨ feat: add output validation", unicode.fullMessage)
+
+        val alias = ConventionalCommitSanitizer.sanitize(":sparkles: feat: add output validation")
+        assertEquals(":sparkles: feat: add output validation", alias.fullMessage)
+    }
+
+    @Test
     fun `test sanitize markdown code fences`() {
         val raw = "```\nfix(parser): handle empty strings\n\nResolve edge-case when input length is 0.\n```"
         val message = ConventionalCommitSanitizer.sanitize(raw)

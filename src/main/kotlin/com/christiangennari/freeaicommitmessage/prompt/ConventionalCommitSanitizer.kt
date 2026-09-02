@@ -10,6 +10,7 @@ class InvalidCommitMessageException : IllegalArgumentException(MESSAGE) {
 
 object ConventionalCommitSanitizer {
     private val conventionalCommitSubject = Regex("^[a-z][a-z0-9-]*(?:\\([^\\r\\n)]+\\))?!?: [^\\r\\n]+$")
+    private val gitmojiPrefix = Regex("^(?:\\p{So}(?:\\uFE0E|\\uFE0F)?(?:\\u200D\\p{So}(?:\\uFE0E|\\uFE0F)?)*|:[a-zA-Z0-9][a-zA-Z0-9_+\\-]*:)\\s+")
     private val reasoningMarker = Regex("</?(?:think|analysis|reasoning)\\b", RegexOption.IGNORE_CASE)
     private val planningProseMarker = Regex(
         "(?im)^\\s*(?:analysis|reasoning|thinking process|here(?:'s| is)\\s+(?:the\\s+)?commit message|the commit message is)\\s*[:\\-]"
@@ -41,7 +42,8 @@ object ConventionalCommitSanitizer {
         if (subjectIndex < 0) throw InvalidCommitMessageException()
 
         val subject = lines[subjectIndex].trim()
-        if (!conventionalCommitSubject.matches(subject)) {
+        val conventionalSubject = gitmojiPrefix.replaceFirst(subject, "")
+        if (!conventionalCommitSubject.matches(conventionalSubject)) {
             throw InvalidCommitMessageException()
         }
         val bodyLines = if (subjectIndex < lines.size - 1) {
