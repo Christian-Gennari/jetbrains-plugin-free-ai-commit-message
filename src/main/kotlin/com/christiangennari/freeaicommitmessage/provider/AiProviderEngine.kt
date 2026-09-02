@@ -4,6 +4,7 @@ import com.christiangennari.freeaicommitmessage.domain.CommitInput
 import com.christiangennari.freeaicommitmessage.domain.GenerationOptions
 import com.christiangennari.freeaicommitmessage.domain.ProviderKind
 import com.christiangennari.freeaicommitmessage.domain.ProviderProfile
+import com.christiangennari.freeaicommitmessage.prompt.InvalidCommitMessageException
 import com.intellij.openapi.progress.ProgressIndicator
 
 class AiProviderEngine(
@@ -19,26 +20,29 @@ class AiProviderEngine(
         options: GenerationOptions,
         indicator: ProgressIndicator? = null
     ): ProviderResult {
-        if (isPrimaryFreeCloud(profile)) {
-            val primaryResult = generateOnce(profile, apiKey, input, options, indicator)
-            if (primaryResult !is ProviderResult.Error || !primaryResult.retryable) return primaryResult
-
-            // The fallback is keyless even if a stale key exists for the free profile.
-            return generateOnce(
-                profile.copy(endpoint = BuiltInProfiles.FREE_FALLBACK_ENDPOINT),
-                null,
-                input,
-                options,
-                indicator
-            )
+        val attempts = if (isPrimaryFreeCloud(profile)) {
+            mutableListOf(
+                profile,
+                profile.copy(endpoint = BuiltInProfiles.FREE_FALLBACK_ENDPOINT)
+            ).apply {
+                if (options.autoRetryInvalidOutput) add(profile)
+            }
+        } else {
+            listOf(profile, profile)
         }
 
-        var attempt = 0
-        while (true) {
-            val result = generateOnce(profile, apiKey, input, options, indicator)
-            if (result !is ProviderResult.Error || !result.retryable || attempt >= 1) return result
-            attempt += 1
+        var lastResult: ProviderResult? = null
+        for (index in attempts.indices) {
+            val result = generateOnce(attempts[index], apiKey, input, options, indicator)
+            if (result !is ProviderResult.Error || !result.retryable) return result
+
+            val invalidOutput = result.message == InvalidCommitMessageException.MESSAGE
+            val mayRetry = (!invalidOutput || options.autoRetryInvalidOutput) && (invalidOutput || index == 0)
+            if (!mayRetry || index == attempts.lastIndex) return result
+            lastResult = result
         }
+
+        return lastResult ?: ProviderResult.Error(InvalidCommitMessageException.MESSAGE, retryable = true)
     }
 
     private fun isPrimaryFreeCloud(profile: ProviderProfile): Boolean {

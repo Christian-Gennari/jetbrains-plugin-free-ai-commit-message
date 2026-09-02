@@ -21,6 +21,7 @@ class FreeAiCommitMessageConfigurable : Configurable {
     private val temperatureField = JBTextField()
     private val languageField = JBTextField()
     private val gitmojiCheckbox = JBCheckBox("Prefix commit messages with Gitmoji (:sparkles:, :bug:, etc.)")
+    private val autoRetryInvalidOutputCheckbox = JBCheckBox("Automatically retry invalid commit output")
 
     private val profilesList = settingsService.getAllProfiles()
     private val originalKeys = mutableMapOf<String, String>()
@@ -52,6 +53,7 @@ class FreeAiCommitMessageConfigurable : Configurable {
         temperatureField.text = settings.defaultTemperature.toString()
         languageField.text = settings.promptLanguage
         gitmojiCheckbox.isSelected = settings.useGitmoji
+        autoRetryInvalidOutputCheckbox.isSelected = settings.autoRetryInvalidOutput
 
         return panel {
             group("Active AI Provider") {
@@ -85,6 +87,10 @@ class FreeAiCommitMessageConfigurable : Configurable {
                 row {
                     cell(gitmojiCheckbox)
                 }
+                row {
+                    cell(autoRetryInvalidOutputCheckbox)
+                        .comment("Retry invalid or badly formatted provider output automatically")
+                }
             }
         }
     }
@@ -100,8 +106,9 @@ class FreeAiCommitMessageConfigurable : Configurable {
         val tempModified = temperatureField.text.toDoubleOrNull() != settings.defaultTemperature
         val langModified = languageField.text.trim() != settings.promptLanguage
         val gitmojiModified = gitmojiCheckbox.isSelected != settings.useGitmoji
+        val autoRetryModified = autoRetryInvalidOutputCheckbox.isSelected != settings.autoRetryInvalidOutput
 
-        return keyModified || profileModified || maxDiffModified || timeoutModified || tempModified || langModified || gitmojiModified
+        return keyModified || profileModified || maxDiffModified || timeoutModified || tempModified || langModified || gitmojiModified || autoRetryModified
     }
 
     override fun apply() {
@@ -114,6 +121,7 @@ class FreeAiCommitMessageConfigurable : Configurable {
         settings.defaultTemperature = Validation.clampTemperature(temperatureField.text.toDoubleOrNull() ?: 0.2)
         settings.promptLanguage = languageField.text.trim().ifBlank { "English" }
         settings.useGitmoji = gitmojiCheckbox.isSelected
+        settings.autoRetryInvalidOutput = autoRetryInvalidOutputCheckbox.isSelected
 
         val key = String(apiKeyField.password).trim()
         originalKeys[selectedProfile.id] = key
@@ -131,5 +139,6 @@ class FreeAiCommitMessageConfigurable : Configurable {
         temperatureField.text = settings.defaultTemperature.toString()
         languageField.text = settings.promptLanguage
         gitmojiCheckbox.isSelected = settings.useGitmoji
+        autoRetryInvalidOutputCheckbox.isSelected = settings.autoRetryInvalidOutput
     }
 }

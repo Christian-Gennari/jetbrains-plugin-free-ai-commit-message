@@ -13,6 +13,7 @@ class FreeAiCommitMessageSettings {
     var defaultTemperature: Double = 0.2
     var promptLanguage: String = "English"
     var useGitmoji: Boolean = false
+    var autoRetryInvalidOutput: Boolean = true
 
     @Tag("customProfiles")
     @XCollection(style = XCollection.Style.v2)
@@ -24,7 +25,8 @@ class FreeAiCommitMessageSettings {
             requestTimeoutMs = requestTimeoutMs,
             defaultTemperature = defaultTemperature,
             promptLanguage = promptLanguage,
-            useGitmoji = useGitmoji
+            useGitmoji = useGitmoji,
+            autoRetryInvalidOutput = autoRetryInvalidOutput
         )
     }
 }

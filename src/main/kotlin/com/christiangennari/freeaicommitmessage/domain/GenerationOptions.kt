@@ -8,5 +8,6 @@ data class GenerationOptions(
     val requestTimeoutMs: Long = 120000L,
     val defaultTemperature: Double = 0.2,
     val promptLanguage: String = "English",
-    val useGitmoji: Boolean = false
+    val useGitmoji: Boolean = false,
+    val autoRetryInvalidOutput: Boolean = true
 )
