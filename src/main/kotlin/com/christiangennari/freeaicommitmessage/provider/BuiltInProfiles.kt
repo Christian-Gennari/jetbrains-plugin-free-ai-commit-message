@@ -42,10 +42,10 @@ object BuiltInProfiles {
 
     val OPENROUTER = ProviderProfile(
         id = "openrouter",
-        name = "OpenRouter Free (cohere/north-mini-code:free)",
+        name = "OpenRouter Free (openrouter/free)",
         kind = ProviderKind.OPENAI_COMPATIBLE,
         endpoint = "https://openrouter.ai/api/v1",
-        model = "cohere/north-mini-code:free",
+        model = "openrouter/free",
         isBuiltIn = true
     )
 

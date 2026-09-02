@@ -7,8 +7,10 @@ import com.christiangennari.freeaicommitmessage.domain.ProviderProfile
 import com.christiangennari.freeaicommitmessage.domain.Validation
 import com.christiangennari.freeaicommitmessage.prompt.CommitPromptBuilder
 import com.christiangennari.freeaicommitmessage.prompt.ConventionalCommitSanitizer
+import com.christiangennari.freeaicommitmessage.prompt.InvalidCommitMessageException
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.progress.ProgressIndicator
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import java.io.IOException
@@ -38,7 +40,10 @@ class OpenAiCompatibleProvider(private val httpClient: HttpClient = HttpClient.n
     )
 
     @Serializable
-    private data class Choice(val message: Message? = null)
+    private data class Choice(
+        val message: Message? = null,
+        @SerialName("finish_reason") val finishReason: String? = null
+    )
 
     @Serializable
     private data class ChatCompletionResponse(
@@ -93,7 +98,11 @@ class OpenAiCompatibleProvider(private val httpClient: HttpClient = HttpClient.n
             val response = awaitResponse(future, indicator, timeout)
             if (response.statusCode() in 200..299) {
                 val completionResp = json.decodeFromString(ChatCompletionResponse.serializer(), response.body())
-                val rawText = completionResp.choices?.firstOrNull()?.message?.content
+                val choice = completionResp.choices?.firstOrNull()
+                if (choice?.finishReason == "length") {
+                    throw InvalidCommitMessageException()
+                }
+                val rawText = choice?.message?.content
                 if (rawText.isNullOrBlank()) {
                     ProviderResult.Error("Provider returned an empty response.", response.statusCode())
                 } else {
@@ -108,6 +117,8 @@ class OpenAiCompatibleProvider(private val httpClient: HttpClient = HttpClient.n
                 }
                 ProviderResult.Error(statusMsg, response.statusCode())
             }
+        } catch (e: InvalidCommitMessageException) {
+            ProviderResult.Error(e.message ?: InvalidCommitMessageException.MESSAGE, retryable = true)
         } catch (e: ProcessCanceledException) {
             future.cancel(true)
             ProviderResult.Cancelled

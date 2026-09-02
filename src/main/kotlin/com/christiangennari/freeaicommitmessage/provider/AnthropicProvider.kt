@@ -6,6 +6,7 @@ import com.christiangennari.freeaicommitmessage.domain.ProviderProfile
 import com.christiangennari.freeaicommitmessage.domain.Validation
 import com.christiangennari.freeaicommitmessage.prompt.CommitPromptBuilder
 import com.christiangennari.freeaicommitmessage.prompt.ConventionalCommitSanitizer
+import com.christiangennari.freeaicommitmessage.prompt.InvalidCommitMessageException
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.progress.ProgressIndicator
 import kotlinx.serialization.Serializable
@@ -109,6 +110,8 @@ class AnthropicProvider(private val httpClient: HttpClient = HttpClient.newBuild
                 }
                 ProviderResult.Error(statusMsg, response.statusCode())
             }
+        } catch (e: InvalidCommitMessageException) {
+            ProviderResult.Error(e.message ?: InvalidCommitMessageException.MESSAGE, retryable = true)
         } catch (e: ProcessCanceledException) {
             future.cancel(true)
             ProviderResult.Cancelled

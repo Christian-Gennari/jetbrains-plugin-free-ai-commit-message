@@ -16,6 +16,7 @@ class BuiltInProfilesTest {
         assertNotNull(BuiltInProfiles.findById("groq"))
         assertNotNull(BuiltInProfiles.findById("ollama"))
         assertNotNull(BuiltInProfiles.findById("openrouter"))
+        assertEquals("openrouter/free", BuiltInProfiles.OPENROUTER.model)
         assertNotNull(BuiltInProfiles.findById("github-models"))
         assertNotNull(BuiltInProfiles.findById("deepseek"))
         assertNotNull(BuiltInProfiles.findById("openai"))

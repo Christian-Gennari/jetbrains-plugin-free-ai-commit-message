@@ -40,7 +40,7 @@ Works out of the box with zero configuration and no API keys required, or connec
 | **#2** | **Google Gemini** | `gemini-3.5-flash-lite` | Free API Key | **1,500 req/day** (30 RPM) | [Google AI Studio](https://aistudio.google.com/app/apikey) |
 | **#3** | **Groq Cloud** | `openai/gpt-oss-120b` | Free API Key | **14,400 req/day** (30 RPM, ~300ms latency) | [Groq Console](https://console.groq.com/keys) |
 | **#4** | **Local Ollama** | `qwen2.5-coder:3b` | Local Server | **Unlimited** (100% offline, zero data leaves machine) | [Ollama](https://ollama.com) |
-| **#5** | **OpenRouter Free** | `cohere/north-mini-code:free` | Free API Key | Free community tier | [OpenRouter Keys](https://openrouter.ai/keys) |
+| **#5** | **OpenRouter Free** | `openrouter/free` | Free API Key | Free community tier | [OpenRouter Keys](https://openrouter.ai/keys) |
 | **#6** | **GitHub Models** | `gpt-4o-mini` | GitHub PAT | **150 req/day** (15 RPM) | [GitHub PAT Tokens](https://github.com/settings/tokens) |
 | — | **DeepSeek** | `deepseek-chat` | BYOK | High reasoning, low cost | [DeepSeek Platform](https://platform.deepseek.com) |
 | — | **OpenAI** | `gpt-4o-mini` | BYOK | Direct OpenAI API | [OpenAI Platform](https://platform.openai.com) |
