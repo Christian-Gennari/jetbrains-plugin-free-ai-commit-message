@@ -33,12 +33,14 @@ class ProviderMockTest {
 
     class MockHttpClient(private val responseProvider: (HttpRequest) -> HttpResponse<String>) : HttpClient() {
         var lastCapturedRequest: HttpRequest? = null
+        val capturedRequests = mutableListOf<HttpRequest>()
 
         override fun <T : Any?> sendAsync(
             request: HttpRequest,
             responseBodyHandler: HttpResponse.BodyHandler<T>?
         ): CompletableFuture<HttpResponse<T>> {
             lastCapturedRequest = request
+            capturedRequests += request
             val resp = responseProvider(request) as HttpResponse<T>
             return CompletableFuture.completedFuture(resp)
         }
@@ -203,5 +205,120 @@ class ProviderMockTest {
 
         assertTrue(result is ProviderResult.Success)
         assertEquals("feat: zero setup commit message", (result as ProviderResult.Success).message.subject)
+    }
+
+    @Test
+    fun `test free cloud provider falls back to Cloudflare on retryable response`() {
+        val mockClient = MockHttpClient { req ->
+            if (req.uri().host == "commit.cgennari.com") {
+                MockHttpResponse(503, "server unavailable")
+            } else {
+                MockHttpResponse(
+                    200,
+                    """{"choices":[{"message":{"role":"assistant","content":"fix: recover with fallback"}}]}"""
+                )
+            }
+        }
+        val engine = AiProviderEngine(openAiProvider = OpenAiCompatibleProvider(mockClient))
+
+        val result = engine.generate(
+            BuiltInProfiles.FREE_CLOUD,
+            "stale-key",
+            CommitInput("diff", "", emptyList()),
+            GenerationOptions()
+        )
+
+        assertTrue(result is ProviderResult.Success)
+        assertEquals("fix: recover with fallback", (result as ProviderResult.Success).message.subject)
+        assertEquals(
+            listOf(
+                "https://commit.cgennari.com/v1/chat/completions",
+                "https://free-ai-commit-fallback.api-9d5.workers.dev/v1/chat/completions"
+            ),
+            mockClient.capturedRequests.map { it.uri().toString() }
+        )
+        assertTrue(mockClient.capturedRequests[1].headers().firstValue("Authorization").isEmpty)
+        assertEquals(
+            "Free-AI-Commit-Message/1.0",
+            mockClient.capturedRequests[1].headers().firstValue("User-Agent").orElse(null)
+        )
+    }
+
+    @Test
+    fun `test free cloud provider falls back after invalid generated output`() {
+        val mockClient = MockHttpClient { req ->
+            if (req.uri().host == "commit.cgennari.com") {
+                MockHttpResponse(
+                    200,
+                    """{"choices":[{"message":{"role":"assistant","content":"not a conventional commit"}}]}"""
+                )
+            } else {
+                MockHttpResponse(
+                    200,
+                    """{"choices":[{"message":{"role":"assistant","content":"feat: use validated fallback"}}]}"""
+                )
+            }
+        }
+        val engine = AiProviderEngine(openAiProvider = OpenAiCompatibleProvider(mockClient))
+
+        val result = engine.generate(
+            BuiltInProfiles.FREE_CLOUD,
+            null,
+            CommitInput("diff", "", emptyList()),
+            GenerationOptions()
+        )
+
+        assertTrue(result is ProviderResult.Success)
+        assertEquals("feat: use validated fallback", (result as ProviderResult.Success).message.subject)
+        assertEquals(2, mockClient.capturedRequests.size)
+    }
+
+    @Test
+    fun `test free cloud provider falls back after truncated generated output`() {
+        val mockClient = MockHttpClient { req ->
+            if (req.uri().host == "commit.cgennari.com") {
+                MockHttpResponse(
+                    200,
+                    """{"choices":[{"finish_reason":"length","message":{"role":"assistant","content":"feat: truncated"}}]}"""
+                )
+            } else {
+                MockHttpResponse(
+                    200,
+                    """{"choices":[{"message":{"role":"assistant","content":"feat: recover truncation"}}]}"""
+                )
+            }
+        }
+        val engine = AiProviderEngine(openAiProvider = OpenAiCompatibleProvider(mockClient))
+
+        val result = engine.generate(
+            BuiltInProfiles.FREE_CLOUD,
+            null,
+            CommitInput("diff", "", emptyList()),
+            GenerationOptions()
+        )
+
+        assertTrue(result is ProviderResult.Success)
+        assertEquals("feat: recover truncation", (result as ProviderResult.Success).message.subject)
+        assertEquals(2, mockClient.capturedRequests.size)
+    }
+
+    @Test
+    fun `test free cloud provider does not fall back for ordinary client errors`() {
+        for (status in listOf(400, 401, 403)) {
+            val mockClient = MockHttpClient { MockHttpResponse(status, "private error body") }
+            val engine = AiProviderEngine(openAiProvider = OpenAiCompatibleProvider(mockClient))
+
+            val result = engine.generate(
+                BuiltInProfiles.FREE_CLOUD,
+                null,
+                CommitInput("diff", "", emptyList()),
+                GenerationOptions()
+            )
+
+            assertTrue(result is ProviderResult.Error)
+            assertEquals(status, (result as ProviderResult.Error).statusCode)
+            assertEquals(1, mockClient.capturedRequests.size)
+            assertTrue(!(result as ProviderResult.Error).message.contains("private error body"))
+        }
     }
 }
