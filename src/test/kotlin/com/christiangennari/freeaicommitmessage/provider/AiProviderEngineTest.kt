@@ -5,6 +5,7 @@ import com.christiangennari.freeaicommitmessage.domain.CommitMessage
 import com.christiangennari.freeaicommitmessage.domain.GenerationOptions
 import com.christiangennari.freeaicommitmessage.domain.ProviderKind
 import com.christiangennari.freeaicommitmessage.domain.ProviderProfile
+import com.christiangennari.freeaicommitmessage.prompt.InvalidCommitMessageException
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
