@@ -4,6 +4,15 @@ import com.christiangennari.freeaicommitmessage.domain.ProviderKind
 import com.christiangennari.freeaicommitmessage.domain.ProviderProfile
 
 object BuiltInProfiles {
+    val FREE_CLOUD = ProviderProfile(
+        id = "free",
+        name = "Free (No Setup Required)",
+        kind = ProviderKind.FREE_CLOUD,
+        endpoint = "https://commit.cgennari.com/v1",
+        model = "free",
+        isBuiltIn = true
+    )
+
     val GEMINI = ProviderProfile(
         id = "gemini",
         name = "Google Gemini (gemini-3.5-flash-lite)",
@@ -33,10 +42,10 @@ object BuiltInProfiles {
 
     val OPENROUTER = ProviderProfile(
         id = "openrouter",
-        name = "OpenRouter Free (cohere/north-mini-code:free)",
+        name = "OpenRouter Free (openrouter/free)",
         kind = ProviderKind.OPENAI_COMPATIBLE,
         endpoint = "https://openrouter.ai/api/v1",
-        model = "cohere/north-mini-code:free",
+        model = "openrouter/free",
         isBuiltIn = true
     )
 
@@ -77,6 +86,7 @@ object BuiltInProfiles {
     )
 
     val ALL_PRESETS = listOf(
+        FREE_CLOUD,
         GEMINI,
         GROQ,
         OLLAMA,

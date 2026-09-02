@@ -8,7 +8,7 @@ import com.intellij.openapi.progress.ProgressIndicator
 
 sealed class ProviderResult {
     data class Success(val message: CommitMessage) : ProviderResult()
-    data class Error(val message: String, val statusCode: Int? = null) : ProviderResult()
+    data class Error(val message: String, val statusCode: Int? = null, val retryable: Boolean = false) : ProviderResult()
     object Cancelled : ProviderResult()
 }
 

@@ -19,9 +19,24 @@ class AiProviderEngine(
         options: GenerationOptions,
         indicator: ProgressIndicator? = null
     ): ProviderResult {
+        var attempt = 0
+        while (true) {
+            val result = generateOnce(profile, apiKey, input, options, indicator)
+            if (result !is ProviderResult.Error || !result.retryable || attempt >= 1) return result
+            attempt += 1
+        }
+    }
+
+    private fun generateOnce(
+        profile: ProviderProfile,
+        apiKey: String?,
+        input: CommitInput,
+        options: GenerationOptions,
+        indicator: ProgressIndicator?
+    ): ProviderResult {
         return when (profile.kind) {
             ProviderKind.GEMINI -> geminiProvider.generate(profile, apiKey, input, options, indicator)
-            ProviderKind.OPENAI_COMPATIBLE, ProviderKind.OLLAMA -> openAiProvider.generate(profile, apiKey, input, options, indicator)
+            ProviderKind.FREE_CLOUD, ProviderKind.OPENAI_COMPATIBLE, ProviderKind.OLLAMA -> openAiProvider.generate(profile, apiKey, input, options, indicator)
             ProviderKind.ANTHROPIC -> anthropicProvider.generate(profile, apiKey, input, options, indicator)
         }
     }

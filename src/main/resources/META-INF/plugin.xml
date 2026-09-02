@@ -10,8 +10,9 @@
     
     <h4>Features</h4>
     <ul>
-        <li><b>BYOK with Free Quotas:</b> Connect directly with your own API keys for Gemini, Groq, OpenRouter, GitHub Models, DeepSeek, OpenAI, and Claude.</li>
-        <li><b>100% Offline Local Models:</b> Run completely offline with local Ollama (no API key required).</li>
+        <li><b>Zero-Config Free Quick Start:</b> Works out of the box with no API key or account creation required.</li>
+        <li><b>BYOK with Free Quotas:</b> Connect directly with your own personal API keys for Gemini (1,500 req/day), Groq (14,400 req/day), OpenRouter, GitHub Models, DeepSeek, OpenAI, and Claude.</li>
+        <li><b>100% Offline Local Models:</b> Run completely offline with local Ollama (zero code leaves your machine).</li>
         <li><b>Encrypted Key Storage:</b> Keys are stored securely in JetBrains <code>PasswordSafe</code> (OS Keychain / Credential Manager / Secret Service). Zero plaintext tokens in config files.</li>
         <li><b>Commit Toolbar Integration:</b> One-click generation directly in the Git Commit Tool Window.</li>
         <li><b>Context-Aware:</b> Existing commit notes are passed as guidance context.</li>

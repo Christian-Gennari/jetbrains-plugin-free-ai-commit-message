@@ -2,6 +2,7 @@ package com.christiangennari.freeaicommitmessage.prompt
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 
 class ConventionalCommitSanitizerTest {
@@ -39,5 +40,33 @@ class ConventionalCommitSanitizerTest {
         val message = ConventionalCommitSanitizer.sanitize(raw)
 
         assertEquals("docs(readme): update install instructions", message.subject)
+    }
+
+    @Test
+    fun `rejects reasoning output instead of inventing a fallback subject`() {
+        assertThrows(InvalidCommitMessageException::class.java) {
+            ConventionalCommitSanitizer.sanitize("<think>internal reasoning</think>\n\nfix: reject leaked reasoning")
+        }
+    }
+
+    @Test
+    fun `rejects explanatory preambles`() {
+        assertThrows(InvalidCommitMessageException::class.java) {
+            ConventionalCommitSanitizer.sanitize("Here is the commit message:\n\nfix: update proxy")
+        }
+    }
+
+    @Test
+    fun `rejects planning prose after a valid subject`() {
+        assertThrows(InvalidCommitMessageException::class.java) {
+            ConventionalCommitSanitizer.sanitize("feat: add endpoint\n\nAnalysis: the change introduces a route")
+        }
+    }
+
+    @Test
+    fun `rejects an invalid subject instead of inventing a fallback`() {
+        assertThrows(InvalidCommitMessageException::class.java) {
+            ConventionalCommitSanitizer.sanitize("not a conventional commit")
+        }
     }
 }
