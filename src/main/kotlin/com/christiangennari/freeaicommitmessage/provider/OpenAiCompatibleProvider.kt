@@ -112,16 +112,27 @@ class OpenAiCompatibleProvider(private val httpClient: HttpClient = HttpClient.n
                     ProviderResult.Success(ConventionalCommitSanitizer.sanitize(rawText))
                 }
             } else {
-                val statusMsg = when (response.statusCode()) {
-                    401, 403 -> "Authentication failed for ${profile.name}. Please check your API key."
-                    429 -> "Rate limit exceeded for ${profile.name}."
-                    in 500..599 -> "${profile.name} service error (HTTP ${response.statusCode()})."
-                    else -> "${profile.name} returned HTTP ${response.statusCode()}."
+                val status = response.statusCode()
+                // The zero-setup profile sends no API key, so an auth rejection means the
+                // endpoint refused the request (blocking proxy, edge protection, outage)
+                // rather than the user holding a bad key.
+                val keylessAuthRejection = status == 401 || status == 403
+
+                val statusMsg = when {
+                    keylessAuthRejection && isKeylessFreeCloud(profile) ->
+                        "The free quick-start service refused the request (HTTP $status). " +
+                            "A network proxy or firewall may be blocking it, or the service may be temporarily unavailable. " +
+                            "Add your own free Gemini or Groq key in Settings, or try again later."
+                    keylessAuthRejection -> "Authentication failed for ${profile.name}. Please check your API key."
+                    status == 429 -> "Rate limit exceeded for ${profile.name}."
+                    status in 500..599 -> "${profile.name} service error (HTTP $status)."
+                    else -> "${profile.name} returned HTTP $status."
                 }
                 ProviderResult.Error(
                     statusMsg,
-                    response.statusCode(),
-                    retryable = response.statusCode() == 408 || response.statusCode() == 429 || response.statusCode() in 500..599
+                    status,
+                    retryable = status == 408 || status == 429 || status in 500..599 ||
+                        (keylessAuthRejection && isKeylessFreeCloud(profile))
                 )
             }
         } catch (e: InvalidCommitMessageException) {
@@ -159,6 +170,10 @@ class OpenAiCompatibleProvider(private val httpClient: HttpClient = HttpClient.n
         } catch (e: Exception) {
             ProviderResult.Error("Unexpected error calling ${profile.name}.")
         }
+    }
+
+    private fun isKeylessFreeCloud(profile: ProviderProfile): Boolean {
+        return profile.kind == ProviderKind.FREE_CLOUD
     }
 
     private fun <T> awaitResponse(

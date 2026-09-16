@@ -304,7 +304,7 @@ class ProviderMockTest {
 
     @Test
     fun `test free cloud provider does not fall back for ordinary client errors`() {
-        for (status in listOf(400, 401, 403)) {
+        for (status in listOf(400, 404, 422)) {
             val mockClient = MockHttpClient { MockHttpResponse(status, "private error body") }
             val engine = AiProviderEngine(openAiProvider = OpenAiCompatibleProvider(mockClient))
 
@@ -320,5 +320,69 @@ class ProviderMockTest {
             assertEquals(1, mockClient.capturedRequests.size)
             assertTrue(!(result as ProviderResult.Error).message.contains("private error body"))
         }
+    }
+
+    @Test
+    fun `keyless free profile treats auth rejection as endpoint refusal and fails over`() {
+        val mockClient = MockHttpClient { req ->
+            if (req.uri().host == "commit.cgennari.com") {
+                // e.g. an intercepting proxy or edge protection rejecting the request
+                MockHttpResponse(401, "{\"error\":{\"message\":\"Protected deployment\",\"code\":\"401\"}}")
+            } else {
+                MockHttpResponse(
+                    200,
+                    """{"choices":[{"message":{"role":"assistant","content":"fix: recover through fallback"}}]}"""
+                )
+            }
+        }
+        val engine = AiProviderEngine(openAiProvider = OpenAiCompatibleProvider(mockClient))
+
+        val result = engine.generate(
+            BuiltInProfiles.FREE_CLOUD,
+            null,
+            CommitInput("diff", "", emptyList()),
+            GenerationOptions()
+        )
+
+        assertTrue(result is ProviderResult.Success)
+        assertEquals("fix: recover through fallback", (result as ProviderResult.Success).message.subject)
+        assertEquals(2, mockClient.capturedRequests.size)
+    }
+
+    @Test
+    fun `keyless free profile reports endpoint refusal instead of blaming a missing api key`() {
+        val mockClient = MockHttpClient { MockHttpResponse(401, "{\"error\":{\"message\":\"Protected deployment\"}}") }
+        val engine = AiProviderEngine(openAiProvider = OpenAiCompatibleProvider(mockClient))
+
+        val result = engine.generate(
+            BuiltInProfiles.FREE_CLOUD,
+            null,
+            CommitInput("diff", "", emptyList()),
+            GenerationOptions()
+        )
+
+        assertTrue(result is ProviderResult.Error)
+        val error = result as ProviderResult.Error
+        assertEquals(401, error.statusCode)
+        assertTrue(error.message.contains("refused the request"), "was: ${error.message}")
+        assertTrue(!error.message.contains("check your API key"), "was: ${error.message}")
+        assertTrue(!error.message.contains("Protected deployment"))
+    }
+
+    @Test
+    fun `profiles that require an api key still blame the api key on auth rejection`() {
+        val mockClient = MockHttpClient { MockHttpResponse(401, "unauthorized") }
+        val engine = AiProviderEngine(openAiProvider = OpenAiCompatibleProvider(mockClient))
+
+        val result = engine.generate(
+            BuiltInProfiles.GROQ,
+            "bad-key",
+            CommitInput("diff", "", emptyList()),
+            GenerationOptions()
+        )
+
+        assertTrue(result is ProviderResult.Error)
+        assertTrue((result as ProviderResult.Error).message.contains("check your API key"))
+        assertEquals(1, mockClient.capturedRequests.size)
     }
 }
